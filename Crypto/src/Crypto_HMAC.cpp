@@ -11,7 +11,7 @@
 
 #include "Crypto_HMAC.h"
 
-std::string getHmacForGivenAlgorithm(const std::string& hmacSecretKey, const std::string& hexEncodedMessage,const std::string& algorithm){
+std::string getHmacForGivenAlgorithm(const std::string& hmacSecretKey, const std::string& hexEncodedMessage,const std::string& hashAlgorithm){
     std::string mac;
     
     mac.clear();
@@ -24,23 +24,23 @@ std::string getHmacForGivenAlgorithm(const std::string& hmacSecretKey, const std
         CryptoPP::HMAC <CryptoPP::SHA512> hmacSha512((byte *)hmacSecretKey.c_str(), hmacSecretKey.size());
         
         //Hash Filters
-        CryptoPP::HashFilter hashFilterMd5(hmacMd5,new CryptoPP::StringSink(mac));
-        CryptoPP::HashFilter hashFilterSha1(hmacSha1,new CryptoPP::StringSink(mac));
-        CryptoPP::HashFilter hashFilterSha256(hmacSha256,new CryptoPP::StringSink(mac));
-        CryptoPP::HashFilter hashFilterSha512(hmacSha512,new CryptoPP::StringSink(mac));
+        CryptoPP::HashFilter hashFilterMd5(hmacMd5,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac)));
+        CryptoPP::HashFilter hashFilterSha1(hmacSha1,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac)));
+        CryptoPP::HashFilter hashFilterSha256(hmacSha256,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac)));
+        CryptoPP::HashFilter hashFilterSha512(hmacSha512,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac)));
         
         CryptoPP::ChannelSwitch cs;
         
-        if(algorithm=="MD5"){
+        if(hashAlgorithm=="MD5"){
             cs.AddDefaultRoute(hashFilterMd5);
         }
-        else if(algorithm=="SHA1"){
+        else if(hashAlgorithm=="SHA1"){
             cs.AddDefaultRoute(hashFilterSha1);
         }
-        else if(algorithm=="SHA256"){
+        else if(hashAlgorithm=="SHA256"){
             cs.AddDefaultRoute(hashFilterSha256);
         }
-        else if(algorithm=="SHA512"){
+        else if(hashAlgorithm=="SHA512"){
             cs.AddDefaultRoute(hashFilterSha512);
         }
         

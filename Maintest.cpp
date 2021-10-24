@@ -1,23 +1,38 @@
 #include <bits/stdc++.h>
 
 #include "Crypto_HMAC.h"
+#include "Crypto_HOTP.h"
 #include "Crypto_IO.h"
 
-int main(){
+int main()
+{
     std::string mykey = "12345678901234567890";
-    std::string msg = "0000000000000007";
+    std::string msg = "0000000000000001";
+    long long counter = 0;
     std::cout << "key: " << mykey << std::endl;
-    std::cout << "msg: " << msg << std::endl << std::endl;;
-    encode_and_print_mac(mykey,"Raw Input key");
-    encode_and_print_mac(msg,"Raw Input msg");
+//     std::cout << "msg: " << msg << std::endl << std::endl;
+    std::cout << "Counter\tHOTP" << std::endl;
+    for(int i=0;i<10;i++,counter++)
+        std::cout << counter << '\t' << getHotp(mykey,counter) << std::endl;
+
+//     encode_and_print_mac(mykey,"Raw Input key");
+//     encode_and_print_mac(msg,"Raw Input msg");
+//
+//     std::string macForMd5 = getHmacForGivenAlgorithm(mykey,msg,"MD5");
+//     std::cout << "MD5:\t" << macForMd5 << std::endl;
+//     std::cout << "MD5 Size:\t" << macForMd5.size()/2 << std::endl;
+//
+//     std::string macForSha1 = getHmacForGivenAlgorithm(mykey,msg,"SHA1");
+//     std::cout << "SHA1:\t" << macForSha1 << std::endl;
+//     std::cout << "SHA1 Size:\t" << macForSha1.size()/2 << std::endl;
+//
+//     std::string macForSha256 = getHmacForGivenAlgorithm(mykey,msg,"SHA256");
+//     std::cout << "SHA256:\t" << macForSha256 << std::endl;
+//     std::cout << "SHA256 Size:\t" << macForSha256.size()/2 << std::endl;
+//
+//     std::string macForSha512 = getHmacForGivenAlgorithm(mykey,msg,"SHA512");
+//     std::cout << "SHA512:\t" << macForSha512 << std::endl;
+//     std::cout << "SHA512 Size:\t" << macForSha512.size()/2 << std::endl;
     
-    std::string macForMd5 = getHmacForGivenAlgorithm(mykey,msg,"MD5");
-    encode_and_print_mac(macForMd5,"MD5");
-    std::string macForSha1 = getHmacForGivenAlgorithm(mykey,msg,"SHA1");
-    encode_and_print_mac(macForSha1,"SHA1");
-    std::string macForSha256 = getHmacForGivenAlgorithm(mykey,msg,"SHA256");
-    encode_and_print_mac(macForSha256,"SHA256");
-    std::string macForSha512 = getHmacForGivenAlgorithm(mykey,msg,"SHA512");
-    encode_and_print_mac(macForSha512,"SHA512");
     return 0;
 }
