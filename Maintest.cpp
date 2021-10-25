@@ -4,16 +4,15 @@
 #include "Crypto_HOTP.h"
 #include "Crypto_IO.h"
 
-int main()
-{
+int main() {
     std::string mykey = "12345678901234567890";
     std::string msg = "0000000000000001";
     long long counter = 0;
     std::cout << "key: " << mykey << std::endl;
 //     std::cout << "msg: " << msg << std::endl << std::endl;
     std::cout << "Counter\tHOTP" << std::endl;
-    for(int i=0;i<10;i++,counter++)
-        std::cout << counter << '\t' << getHotp(mykey,counter) << std::endl;
+    for (int i = 0; i < 10; i++, counter++)
+        std::cout << counter << '\t' << computeHotp(mykey,counter) << std::endl;
 
 //     encode_and_print_mac(mykey,"Raw Input key");
 //     encode_and_print_mac(msg,"Raw Input msg");

@@ -3,6 +3,8 @@
 
 typedef unsigned char byte;
 
-std::string getHmacForGivenAlgorithm(const std::string& hmacSecretKey, const std::string& hexEncodedMessage, const std::string& hashAlgorithm = "SHA1");
+std::string computeHmacForGivenAlgorithm(const std::string& hmacSecretKey, 
+                                         const std::string& hexEncodedMessage, 
+                                         const std::string& hashAlgorithm = "SHA1");
 
 #endif
