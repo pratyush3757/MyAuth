@@ -1,12 +1,12 @@
 #include <bits/stdc++.h>
 
-#include "Crypto_HMAC.h"
-#include "Crypto_HOTP.h"
-#include "Crypto_IO.h"
+#include "crypto_hmac.h"
+#include "crypto_hotp.h"
+#include "crypto_io.h"
 
 int main() {
     std::string mykey = "12345678901234567890";
-    std::string msg = "0000000000000001";
+    std::string msg = "0000000000000000";
     long long counter = 0;
     std::cout << "key: " << mykey << std::endl;
 //     std::cout << "msg: " << msg << std::endl << std::endl;

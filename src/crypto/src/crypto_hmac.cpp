@@ -10,7 +10,7 @@
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 #include <cryptopp/md5.h>
 
-#include "Crypto_HMAC.h"
+#include "crypto_hmac.h"
 
 std::string computeHmacForGivenAlgorithm(const std::string& hmacSecretKey,
                                          const std::string& hexEncodedMessage,
@@ -30,13 +30,13 @@ std::string computeHmacForGivenAlgorithm(const std::string& hmacSecretKey,
 
         //Hash Filters
         CryptoPP::HashFilter hashFilterMd5(
-            hmacMd5,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac)));
+            hmacMd5,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac),false));
         CryptoPP::HashFilter hashFilterSha1(
-            hmacSha1,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac)));
+            hmacSha1,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac),false));
         CryptoPP::HashFilter hashFilterSha256(
-            hmacSha256,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac)));
+            hmacSha256,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac),false));
         CryptoPP::HashFilter hashFilterSha512(
-            hmacSha512,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac)));
+            hmacSha512,new CryptoPP::HexEncoder(new CryptoPP::StringSink(mac),false));
 
         CryptoPP::ChannelSwitch cs;
 
