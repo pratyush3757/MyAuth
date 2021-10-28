@@ -10,7 +10,7 @@
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 #include <cryptopp/md5.h>
 
-#include "crypto_hmac.h"
+#include "token_hmac.h"
 
 std::string computeHmacForGivenAlgorithm(const std::string& hmacSecretKey,
                                          const std::string& hexEncodedMessage,

@@ -1,5 +1,5 @@
-#ifndef _CRYPTO_HMAC_BYTE_H_
-#define _CRYPTO_HMAC_BYTE_H_
+#ifndef _TOKEN_HMAC_BYTE_H_
+#define _TOKEN_HMAC_BYTE_H_
 
 typedef unsigned char byte;
 

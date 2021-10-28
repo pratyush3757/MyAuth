@@ -3,9 +3,9 @@
 #include <cryptopp/filters.h>
 #include <cryptopp/hex.h>
 
-#include "crypto_hotp.h"
-#include "crypto_hmac.h"
-#include "crypto_hex.h"
+#include "token_hotp.h"
+#include "token_hmac.h"
+#include "token_hex.h"
 
 static int getPowerOf10(int n) {
     static const int pow10[10] = {

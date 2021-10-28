@@ -1,5 +1,5 @@
-#ifndef _CRYPTO_HOTP_H_
-#define _CRYPTO_HOTP_H_
+#ifndef _TOKEN_HOTP_H_
+#define _TOKEN_HOTP_H_
 
 std::string computeHotp(const std::string& secretKey, 
                         const long long int counter, 

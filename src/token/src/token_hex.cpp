@@ -3,7 +3,7 @@
 
 #include <cryptopp/hex.h>
 
-#include "crypto_hex.h"
+#include "token_hex.h"
 
 std::string computeHex(const long long int counter) {
     std::stringstream hexStringStream;

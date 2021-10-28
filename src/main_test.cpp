@@ -1,8 +1,8 @@
 #include <bits/stdc++.h>
 
-#include "crypto_hmac.h"
-#include "crypto_hotp.h"
-#include "crypto_io.h"
+#include "token_hmac.h"
+#include "token_hotp.h"
+#include "token_io.h"
 
 int main() {
     std::string mykey = "12345678901234567890";
