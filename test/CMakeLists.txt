@@ -32,6 +32,7 @@ set(LIBS_TO_TEST
 set(TEST_FILES
     token_hmac_tests.cpp
     token_hotp_tests.cpp
+    token_totp_tests.cpp
 )
 # Add test cpp file
 add_executable(${TESTNAME} ${TEST_FILES})

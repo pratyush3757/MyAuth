@@ -3,70 +3,58 @@
 
 TEST(cryptoHotpRfcTests, rfcTestCase1) {
     
-    std::string hmacSecretKey = "12345678901234567890";
+    std::string secretKey = "12345678901234567890";
     long long int counter = 0;
     int codeDigits = 6;
-    bool addChecksum = false;
-    int truncationOffset = -1;
     std::string hashAlgorithm = "SHA1";
     
     EXPECT_EQ("755224",
-              computeHotp(hmacSecretKey,counter=0,
+              computeHotp(secretKey,counter=0,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
     
     EXPECT_EQ("287082",
-              computeHotp(hmacSecretKey,counter=1,
+              computeHotp(secretKey,counter=1,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
     
     EXPECT_EQ("359152",
-              computeHotp(hmacSecretKey,counter=2,
+              computeHotp(secretKey,counter=2,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
     
     EXPECT_EQ("969429",
-              computeHotp(hmacSecretKey,counter=3,
+              computeHotp(secretKey,counter=3,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
     
     EXPECT_EQ("338314",
-              computeHotp(hmacSecretKey,counter=4,
+              computeHotp(secretKey,counter=4,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
     
     EXPECT_EQ("254676",
-              computeHotp(hmacSecretKey,counter=5,
+              computeHotp(secretKey,counter=5,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
     
     EXPECT_EQ("287922",
-              computeHotp(hmacSecretKey,counter=6,
+              computeHotp(secretKey,counter=6,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
     
     EXPECT_EQ("162583",
-              computeHotp(hmacSecretKey,counter=7,
+              computeHotp(secretKey,counter=7,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
     
     EXPECT_EQ("399871",
-              computeHotp(hmacSecretKey,counter=8,
+              computeHotp(secretKey,counter=8,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
     
     EXPECT_EQ("520489",
-              computeHotp(hmacSecretKey,counter=9,
+              computeHotp(secretKey,counter=9,
                           codeDigits,
-                          false /*addChecksum*/,
-                          -1 /*truncationOffset*/, "SHA1" /*hashAlgorithm*/));
+                          hashAlgorithm));
 }

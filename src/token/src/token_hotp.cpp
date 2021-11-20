@@ -16,11 +16,6 @@ static int getPowerOf10(int n) {
     return pow10[n];
 }
 
-static int computeCardChecksum(long num, const int digits) {
-    //TODO: Implement the checksum function
-    return 0;
-}
-
 static void padZerosTowardsLeft(std::string& zeroPaddedHotp, const int digits) {
     const char paddingChar = '0';
 
@@ -28,12 +23,9 @@ static void padZerosTowardsLeft(std::string& zeroPaddedHotp, const int digits) {
         zeroPaddedHotp.insert(0, digits-zeroPaddedHotp.size(), paddingChar);
 }
 
-std::string computeHotp(const std::string& secretKey, const long long counter,
-                        const int codeDigits, const bool addChecksum,
-                        const int truncationOffset,
+std::string computeHotp(const std::string& secretKey, const long long int counter,
+                        const int codeDigits,
                         const std::string& hashAlgorithm) {
-    const int totalDigits = addChecksum ? (codeDigits + 1) : codeDigits;
-
     const std::string hexEncodedCounter = computeHex(counter);
     const std::string hexEncodedMac = computeHmacForGivenAlgorithm(
                                       secretKey, hexEncodedCounter,
@@ -50,11 +42,6 @@ std::string computeHotp(const std::string& secretKey, const long long counter,
     );
 
     int offset = macByteArray[macSizeInBytes - 1] & 0xf;
-    bool isTruncationOffsetValid =  (0 <= truncationOffset) &&
-                                    (truncationOffset < (macSizeInBytes - 4));
-    if (isTruncationOffsetValid) {  // Use user given offset if it's valid
-        offset = truncationOffset;
-    }
 
     int truncatedDecimalOtp = ((macByteArray[offset] & 0x7f) << 24)
                             | ((macByteArray[offset + 1] & 0xff) << 16)
@@ -63,12 +50,9 @@ std::string computeHotp(const std::string& secretKey, const long long counter,
 
     int hotp = truncatedDecimalOtp % getPowerOf10(codeDigits);
 
-    if (addChecksum) {
-        hotp = (hotp*10) + computeCardChecksum(hotp,codeDigits);
-    }
 
     std::string zeroPaddedHotp = std::to_string(hotp);
-    padZerosTowardsLeft(zeroPaddedHotp,totalDigits);
+    padZerosTowardsLeft(zeroPaddedHotp,codeDigits);
 
     return zeroPaddedHotp;
 }
