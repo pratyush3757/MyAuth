@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.21)
 set(TESTNAME "test_runner")
 
 # build source
-project(my_auth VERSION 0.03.1
+project(my_auth VERSION 0.03.2
     DESCRIPTION "TOTP Authenticator"
     LANGUAGES CXX
 )

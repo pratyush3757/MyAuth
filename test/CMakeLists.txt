@@ -26,10 +26,14 @@ FetchContent_MakeAvailable(googletest)
 ################################
 # All libraries to test
 set(LIBS_TO_TEST
-    cryptopp
+    cryptopp # Dependency
     lib_token
 )
+set(TEST_FILES
+    token_hmac_tests.cpp
+    token_hotp_tests.cpp
+)
 # Add test cpp file
-add_executable(${TESTNAME} token_hmac_tests.cpp)
+add_executable(${TESTNAME} ${TEST_FILES})
 # Link test executable against gtest & gtest_main
 target_link_libraries(${TESTNAME} gtest gtest_main ${LIBS_TO_TEST})
