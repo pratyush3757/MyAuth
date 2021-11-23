@@ -1,37 +1,44 @@
 #include <bits/stdc++.h>
+#include <chrono>
 
-#include "token_hmac.h"
-#include "token_hotp.h"
-#include "token_io.h"
+#include "filesystem_io_filehandler.h"
+#include "token_totp.h"
 
 int main() {
-    std::string mykey = "12345678901234567890";
-    std::string msg = "0000000000000000";
-    long long counter = 0;
-    std::cout << "key: " << mykey << std::endl;
-//     std::cout << "msg: " << msg << std::endl << std::endl;
-    std::cout << "Counter\tHOTP" << std::endl;
-    for (int i = 0; i < 10; i++, counter++)
-        std::cout << counter << '\t' << computeHotp(mykey,counter) << std::endl;
-
-//     encode_and_print_mac(mykey,"Raw Input key");
-//     encode_and_print_mac(msg,"Raw Input msg");
-//
-//     std::string macForMd5 = getHmacForGivenAlgorithm(mykey,msg,"MD5");
-//     std::cout << "MD5:\t" << macForMd5 << std::endl;
-//     std::cout << "MD5 Size:\t" << macForMd5.size()/2 << std::endl;
-//
-//     std::string macForSha1 = getHmacForGivenAlgorithm(mykey,msg,"SHA1");
-//     std::cout << "SHA1:\t" << macForSha1 << std::endl;
-//     std::cout << "SHA1 Size:\t" << macForSha1.size()/2 << std::endl;
-//
-//     std::string macForSha256 = getHmacForGivenAlgorithm(mykey,msg,"SHA256");
-//     std::cout << "SHA256:\t" << macForSha256 << std::endl;
-//     std::cout << "SHA256 Size:\t" << macForSha256.size()/2 << std::endl;
-//
-//     std::string macForSha512 = getHmacForGivenAlgorithm(mykey,msg,"SHA512");
-//     std::cout << "SHA512:\t" << macForSha512 << std::endl;
-//     std::cout << "SHA512 Size:\t" << macForSha512.size()/2 << std::endl;
+    
+    
+    std::map<int,Uri> res = readAuthDB("/home/ishu/Desktop/assgn/Auth/supersecretauthdata.dat");
+    
+    for(auto it:res) {
+        std::cout << std::endl << it.first
+        << "\nProtocol: " << it.second.protocol 
+        << "\nOtpType: " << it.second.otpType 
+        << "\nLabel Issuer: " << it.second.labelIssuer 
+        << "\nLabel Accountname: " << it.second.labelAccountName
+        << "\nParameters: "  << std::endl
+        << "\tSecretKey: " << it.second.parameters.secretKey 
+        << "\n\tIssuer: "  << it.second.parameters.issuer 
+        << "\n\tAlgorithm: "  << it.second.parameters.hashAlgorithm
+        << "\n\tDigits: "  << it.second.parameters.codeDigits
+        << "\n\tCounter: "  << it.second.parameters.counter
+        << "\n\tPeriod: "  << it.second.parameters.stepPeriod << std::endl;
+        
+        const auto p1 = std::chrono::system_clock::now();
+        long long int time = std::chrono::duration_cast<std::chrono::seconds>(
+                   p1.time_since_epoch()).count();
+                   
+        const int codeDigits = (it.second.parameters.codeDigits=="") ? 
+                                6 : stoi(it.second.parameters.codeDigits);
+        const int stepPeriod = (it.second.parameters.stepPeriod=="") ? 
+                                30 : stoi(it.second.parameters.stepPeriod);
+        const std::string hashAlgorithm = (it.second.parameters.hashAlgorithm=="") ?
+                                "SHA1" : it.second.parameters.hashAlgorithm;
+                                
+        std::cout << "TOTP: "
+        << computeTotpFromUri(it.second.parameters.secretKey,time,codeDigits,hashAlgorithm,stepPeriod)
+        << "\nLife: " << computeTotpLifetime(time,stepPeriod) << "\nTime: " << time <<std::endl;
+    }
+//     std::cout << computeTotpFromUri("WRN3PQX5UQXQVNQR",1297553958,6,"SHA1",30)<< std::endl;
     
     return 0;
 }

@@ -1,10 +1,10 @@
-#include <iostream>
+#include "token_io.h"
 
 #include <cryptopp/hex.h>
 #include <cryptopp/base32.h>
 #include <cryptopp/base64.h>
 
-#include "token_io.h"
+#include <iostream>
 
 void encodeAndPrintMac(std::string decodedMac,std::string hashAlgorithm) {
     std::string encodedMac;

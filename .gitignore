@@ -1,7 +1,7 @@
 #Custom Definitions
 build/
 TODO
-experimental/
+.experimental/
 *.kdev4
 ##Predefined
 

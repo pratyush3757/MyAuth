@@ -1,11 +1,12 @@
-#include <string>
+#include "token_hotp.h"
+
+#include "token_hmac.h"
+#include "token_hex.h"
 
 #include <cryptopp/filters.h>
 #include <cryptopp/hex.h>
 
-#include "token_hotp.h"
-#include "token_hmac.h"
-#include "token_hex.h"
+#include <string>
 
 static int getPowerOf10(int n) {
     static const int pow10[10] = {
@@ -25,11 +26,12 @@ static void padZerosTowardsLeft(std::string& zeroPaddedHotp, const int digits) {
 
 std::string computeHotp(const std::string& secretKey, const long long int counter,
                         const int codeDigits,
-                        const std::string& hashAlgorithm) {
+                        const std::string& hashAlgorithm,
+                        bool nonAsciiKey) {
     const std::string hexEncodedCounter = computeHex(counter);
     const std::string hexEncodedMac = computeHmacForGivenAlgorithm(
                                       secretKey, hexEncodedCounter,
-                                      hashAlgorithm);
+                                      hashAlgorithm, nonAsciiKey);
 
     const int macSizeInBytes = hexEncodedMac.size() / 2;
     std::vector<CryptoPP::byte> macByteArray;

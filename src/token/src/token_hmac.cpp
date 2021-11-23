@@ -1,5 +1,4 @@
-#include <iostream>
-#include <string>
+#include "token_hmac.h"
 
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/filters.h>
@@ -10,23 +9,44 @@
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 #include <cryptopp/md5.h>
 
-#include "token_hmac.h"
+#include <iostream>
+#include <vector>
+
+typedef unsigned char byte;
 
 std::string computeHmacForGivenAlgorithm(const std::string& hmacSecretKey,
                                          const std::string& hexEncodedMessage,
-                                         const std::string& hashAlgorithm) {
+                                         const std::string& hashAlgorithm,
+                                         bool nonAsciiKey) {
     std::string mac;
     mac.clear();
     try {
+        std::vector<byte> hmacSecretKeyVector;
+        int hmacVectorSize = hmacSecretKey.length() * sizeof(char);
+        hmacSecretKeyVector.resize(hmacVectorSize);
+        if(nonAsciiKey){
+            CryptoPP::StringSource ss(hmacSecretKey, true,
+                new CryptoPP::HexDecoder(
+                    new CryptoPP::ArraySink(&hmacSecretKeyVector[0],hmacVectorSize)
+                ) // HexDecoder
+            );
+        }
+        else {
+            CryptoPP::StringSource ss(hmacSecretKey, true,
+//                 new CryptoPP::HexDecoder(
+                    new CryptoPP::ArraySink(&hmacSecretKeyVector[0],hmacVectorSize)
+//                 ) // HexDecoder
+            );
+        }
         //HMAC Transforms
         CryptoPP::HMAC<CryptoPP::Weak::MD5> hmacMd5(
-            (byte *)hmacSecretKey.c_str(), hmacSecretKey.size());
+            &hmacSecretKeyVector[0], hmacSecretKeyVector.size());
         CryptoPP::HMAC<CryptoPP::SHA1> hmacSha1(
-            (byte *)hmacSecretKey.c_str(), hmacSecretKey.size());
+            &hmacSecretKeyVector[0], hmacSecretKeyVector.size());
         CryptoPP::HMAC<CryptoPP::SHA256> hmacSha256(
-            (byte *)hmacSecretKey.c_str(), hmacSecretKey.size());
+            &hmacSecretKeyVector[0], hmacSecretKeyVector.size());
         CryptoPP::HMAC<CryptoPP::SHA512> hmacSha512(
-            (byte *)hmacSecretKey.c_str(), hmacSecretKey.size());
+            &hmacSecretKeyVector[0], hmacSecretKeyVector.size());
 
         //Hash Filters
         CryptoPP::HashFilter hashFilterMd5(

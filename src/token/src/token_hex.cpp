@@ -1,9 +1,9 @@
-#include <iomanip>
-#include <sstream>
+#include "token_hex.h"
 
 #include <cryptopp/hex.h>
 
-#include "token_hex.h"
+#include <iomanip>
+#include <sstream>
 
 std::string computeHex(const long long int counter) {
     std::stringstream hexStringStream;
