@@ -1,26 +1,27 @@
 #include "filesystem_io_filehandler.h"
+#include "fs_io_crypto_filehandler.h"
 #include "token_totp.h"
 
 #include <ncurses.h>
 
 #include <chrono>
+#include <iostream>
 
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
-int main() {
+void fileop(int argc, char* argv[]);
+
+int main(int argc, char* argv[]) {
     
+    fileop(argc,argv);
     initscr ();
     
     curs_set (0);
-//         while (c < 1000) {
-//                 /* Print at row 0, col 0 */
-//                 mvprintw (0, 0, "%d", c++);
-//                 refresh ();
-//                 sleep (1);
-//         }
-    
-    std::map<int,Uri> res = readAuthDB("/home/ishu/Desktop/assgn/Auth/supersecretauthdata");
+
+    std::string decryptedFile = argv[3];
+    std::map<int,Uri> res = readAuthDB(decryptedFile);
     
     int codeDigits, stepPeriod;
     std::string hashAlgorithm;
@@ -28,18 +29,6 @@ int main() {
     bool flag=true;
     while(flag) {
         for(auto it:res) {
-//         std::cout << std::endl << it.first
-//         << "\nProtocol: " << it.second.protocol 
-//         << "\nOtpType: " << it.second.otpType 
-//         << "\nLabel Issuer: " << it.second.labelIssuer 
-//         << "\nLabel Accountname: " << it.second.labelAccountName
-//         << "\nParameters: "  << std::endl
-//         << "\tSecretKey: " << it.second.parameters.secretKey 
-//         << "\n\tIssuer: "  << it.second.parameters.issuer 
-//         << "\n\tAlgorithm: "  << it.second.parameters.hashAlgorithm
-//         << "\n\tDigits: "  << it.second.parameters.codeDigits
-//         << "\n\tCounter: "  << it.second.parameters.counter
-//         << "\n\tPeriod: "  << it.second.parameters.stepPeriod << std::endl;
 
             const auto p1 = std::chrono::system_clock::now();
             long long int time = std::chrono::duration_cast<std::chrono::seconds>(
@@ -60,10 +49,6 @@ int main() {
             printw(line.c_str());
             refresh();
             
-//         std::cout << "TOTP: "
-//         << computeTotpFromUri(it.second.parameters.secretKey,time,codeDigits,hashAlgorithm,stepPeriod)
-//         << "\nLife: " << computeTotpLifetime(time,stepPeriod) << "\nTime: " << time <<std::endl;
-//         std::cout << computeTotpFromUri("WRN3PQX5UQXQVNQR",1297553958,6,"SHA1",30)<< std::endl;
         }
         sleep(1);
         clear();
@@ -74,21 +59,23 @@ int main() {
     return 0;
 }
 
+void fileop(int argc, char* argv[]){
+    if (argc == 5){
 
-// int showOutput() {
-//         /* compile with gcc -lncurses file.c */
-//         int c = 0;
-//         /* Init ncurses mode */
-//         initscr ();
-//         /* Hide cursor */
-//         curs_set (0);
-//         while (c < 1000) {
-//                 /* Print at row 0, col 0 */
-//                 mvprintw (0, 0, "%d", c++);
-//                 refresh ();
-//                 sleep (1);
-//         }
-//         /* End ncurses mode */
-//         endwin();
-//         return 0;
-// }
+        char * action = argv[1];
+        const char *sourceFileName = argv[2];
+        const char *targetFileName = argv[3];
+        const char *passPhrase = argv[4];
+        
+        if (strcmp(action, "e") == 0){
+            EncryptFile(sourceFileName,targetFileName,passPhrase);
+        }
+        else if (strcmp(action, "d") == 0){
+            DecryptFile(sourceFileName,targetFileName,passPhrase);
+        }
+    }
+    else {
+        std::cout << "Missing/Invalid params" << std::endl;
+        exit(1);
+    }
+}

@@ -7,4 +7,6 @@ add_library(lib_filesystem_io
     ${LIB_FILESYSTEM_IO_SRC}
 )
 
+add_subdirectory(crypto)
+
 target_include_directories(lib_filesystem_io PUBLIC include)
