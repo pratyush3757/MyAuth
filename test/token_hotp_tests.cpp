@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/token/include/token_hotp.h"
+#include "../src/token/src/token_hotp.h"
 
 TEST(cryptoHotpRfcTests, rfcTestCase1) {
     

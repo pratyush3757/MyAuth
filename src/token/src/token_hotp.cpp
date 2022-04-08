@@ -20,18 +20,18 @@ static int getPowerOf10(int n) {
 static void padZerosTowardsLeft(std::string& zeroPaddedHotp, const int digits) {
     const char paddingChar = '0';
 
-    if (digits > zeroPaddedHotp.size())
+    if(digits > zeroPaddedHotp.size())
         zeroPaddedHotp.insert(0, digits-zeroPaddedHotp.size(), paddingChar);
 }
 
 std::string computeHotp(const std::string& secretKey, const long long int counter,
                         const int codeDigits,
                         const std::string& hashAlgorithm,
-                        bool nonAsciiKey) {
+                        SecretKeyFlags keyEncodingFlags) {
     const std::string hexEncodedCounter = computeHex(counter);
     const std::string hexEncodedMac = computeHmacForGivenAlgorithm(
                                       secretKey, hexEncodedCounter,
-                                      hashAlgorithm, nonAsciiKey);
+                                      hashAlgorithm, keyEncodingFlags);
 
     const int macSizeInBytes = hexEncodedMac.size() / 2;
     std::vector<CryptoPP::byte> macByteArray;
@@ -39,8 +39,8 @@ std::string computeHotp(const std::string& secretKey, const long long int counte
 
     CryptoPP::StringSource(hexEncodedMac, true,
         new CryptoPP::HexDecoder(
-            new CryptoPP::ArraySink(&macByteArray[0],macSizeInBytes)
-            )
+            new CryptoPP::ArraySink(&macByteArray[0], macSizeInBytes)
+        )
     );
 
     int offset = macByteArray[macSizeInBytes - 1] & 0xf;
@@ -54,7 +54,7 @@ std::string computeHotp(const std::string& secretKey, const long long int counte
 
 
     std::string zeroPaddedHotp = std::to_string(hotp);
-    padZerosTowardsLeft(zeroPaddedHotp,codeDigits);
+    padZerosTowardsLeft(zeroPaddedHotp, codeDigits);
 
     return zeroPaddedHotp;
 }

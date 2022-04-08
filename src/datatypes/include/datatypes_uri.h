@@ -1,5 +1,5 @@
-#ifndef _FILESYSTEM_IO_UI_H_
-#define _FILESYSTEM_IO_UI_H_
+#ifndef _DATATYPE_URI_
+#define _DATATYPE_URI_
 
 #include <string>
 
@@ -12,7 +12,5 @@ public:
     } parameters;
 
 };
-
-Uri parseUri(const std::string &uri);
 
 #endif

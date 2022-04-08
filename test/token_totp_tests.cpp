@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/token/include/token_totp.h"
+#include "../src/token/src/token_totp.h"
 
 TEST(cryptoTotpRfcTests, rfcTestCaseSHA1) {
     

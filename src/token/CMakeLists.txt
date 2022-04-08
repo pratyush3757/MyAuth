@@ -10,4 +10,6 @@ add_library(lib_token
     ${LIB_TOKEN_SRC}
 )
 
+target_link_libraries(lib_token lib_datatypes)
+
 target_include_directories(lib_token PUBLIC include)

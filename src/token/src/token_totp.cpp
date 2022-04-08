@@ -14,19 +14,20 @@ static const std::string decodeBase32(const std::string& encoded);
 std::string computeTotp(const std::string& secretKey, const long long int time,
                         const int codeDigits,
                         const std::string& hashAlgorithm,
-                        const int stepPeriod,bool nonAsciiKey) {
+                        const int stepPeriod, 
+                        SecretKeyFlags keyEncodingFlags) {
     const long long int timeStep = time/stepPeriod;
-    return computeHotp(secretKey,timeStep,codeDigits,hashAlgorithm,nonAsciiKey);
+    return computeHotp(secretKey, timeStep, codeDigits, hashAlgorithm, keyEncodingFlags);
 }
 
 std::string computeTotpFromUri(const std::string& secretKeyBase32, const long long int time,
                         const int codeDigits,
                         const std::string& hashAlgorithm,
                         const int stepPeriod) {
-    return computeTotp(decodeBase32(secretKeyBase32),time,codeDigits,hashAlgorithm,stepPeriod,true);
+    return computeTotp(decodeBase32(secretKeyBase32), time, codeDigits, hashAlgorithm, stepPeriod, SecretKeyFlags::hex_encoded_secretKey);
 }
 
-int computeTotpLifetime(const long long int time, const int stepPeriod){
+int computeTotpLifetime(const long long int time, const int stepPeriod) {
     return stepPeriod-(time%stepPeriod);
 }
 
@@ -49,8 +50,8 @@ static const std::string decodeBase32(const std::string& encoded) {
     b32decoder.IsolatedInitialize(dp); 
 
     b32decoder.Attach(new CryptoPP::HexEncoder(
-                        new CryptoPP::StringSink(decoded)
-                    ));
+                        new CryptoPP::StringSink(decoded))
+    );
     b32decoder.Put((std::uint8_t*)encoded.c_str(), encoded.size());
     b32decoder.MessageEnd();
 

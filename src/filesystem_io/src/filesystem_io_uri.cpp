@@ -3,15 +3,16 @@
 #include <iostream>
 #include <map>
 #include <algorithm>    // find
+#include <sstream>
 
-static std::map<std::string, std::string> split_query(const std::string &query);
+static std::map<std::string, std::string> split_query(const std::string& query);
 
-Uri parseUri(const std::string &uri) {
+Uri parseUri(const std::string& uri) {
     Uri result;
 
     typedef std::string::const_iterator iterator_t;
 
-    if (uri.length() == 0) {
+    if(uri.length() == 0) {
         return result;
     }
 
@@ -22,9 +23,9 @@ Uri parseUri(const std::string &uri) {
     iterator_t protocolStart = uri.begin();
     iterator_t protocolEnd = std::find(protocolStart, uriEnd, ':');
 
-    if (protocolEnd != uriEnd) {
+    if(protocolEnd != uriEnd) {
         std::string prot = &*(protocolEnd);
-        if ((prot.length() > 3) && (prot.substr(0, 3) == "://")) {
+        if((prot.length() > 3) && (prot.substr(0, 3) == "://")) {
             result.protocol = std::string(protocolStart, protocolEnd);
             protocolEnd += 3;
         }
@@ -43,12 +44,12 @@ Uri parseUri(const std::string &uri) {
 
     iterator_t labelIssuerEnd = std::find(labelIssuerStart, uriEnd, ':');
 
-    if (labelIssuerStart != uriEnd) {
+    if(labelIssuerStart != uriEnd) {
         result.labelIssuer = std::string(labelIssuerStart+1, labelIssuerEnd);
     }
     
-    if (labelIssuerEnd != uriEnd) {
-        result.labelAccountName = std::string(labelIssuerEnd+1,queryStart);
+    if(labelIssuerEnd != uriEnd) {
+        result.labelAccountName = std::string(labelIssuerEnd+1, queryStart);
     }
 
     std::map<std::string, std::string> queryMap = split_query(std::string(queryStart+1, uri.end()));
@@ -87,14 +88,14 @@ Uri parseUri(const std::string &uri) {
 
 }   // Parse
 
-static std::map<std::string, std::string> split_query(const std::string &query) {
+static std::map<std::string, std::string> split_query(const std::string& query) {
     std::map<std::string, std::string> results;
 
     // Split into key value pairs separated by '&'.
     size_t prev_amp_index = 0;
     while(prev_amp_index != std::string::npos) {
         size_t amp_index = query.find_first_of('&', prev_amp_index);
-        if (amp_index == std::string::npos) { 
+        if(amp_index == std::string::npos) { 
             amp_index = query.find_first_of(';', prev_amp_index);
         }
 
@@ -107,7 +108,7 @@ static std::map<std::string, std::string> split_query(const std::string &query) 
         if(equals_index == std::string::npos) {
             continue;
         }
-        else if (equals_index == 0) {
+        else if(equals_index == 0) {
             std::string value(key_value_pair.begin() + equals_index + 1, key_value_pair.end());
             results[""] = value;
         }
@@ -120,6 +121,37 @@ static std::map<std::string, std::string> split_query(const std::string &query) 
 
     return results;
 }
+
+std::string deriveUriString(const Uri inputUri){
+    std::stringstream outStringStream;
+    
+    outStringStream << inputUri.protocol
+    << "://" << inputUri.otpType 
+    << "/" << inputUri.labelIssuer 
+    << ":" << inputUri.labelAccountName
+    << "?secret=" << inputUri.parameters.secretKey;
+    
+    if(!(inputUri.parameters.issuer.empty())) {
+        outStringStream << "&issuer=" << inputUri.parameters.issuer;
+    }
+    if(!(inputUri.parameters.hashAlgorithm.empty())) {
+        outStringStream << "&algorithm=" << inputUri.parameters.hashAlgorithm;
+    }
+    if(!(inputUri.parameters.codeDigits.empty())) {
+        outStringStream << "&digits=" << inputUri.parameters.codeDigits;
+    }
+    if(!(inputUri.parameters.counter.empty())) {
+        outStringStream << "&counter=" << inputUri.parameters.counter;
+    }
+    if(!(inputUri.parameters.stepPeriod.empty())) {
+        outStringStream << "&period=" << inputUri.parameters.stepPeriod;
+    }
+    outStringStream << std::endl;
+    
+    std::string outString = outStringStream.str();
+    return outString;
+}
+
 /*
 int main() {
     std::string test = "otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=6&period=30";

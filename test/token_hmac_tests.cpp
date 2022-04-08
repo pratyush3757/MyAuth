@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/token/include/token_hmac.h"
+#include "../src/token/src/token_hmac.h"
 
 TEST(cryptoHmacRfcTests, rfcTestCase1) {
     

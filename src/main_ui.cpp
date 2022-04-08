@@ -1,32 +1,45 @@
-#include "filesystem_io_filehandler.h"
-#include "fs_io_crypto_filehandler.h"
-#include "token_totp.h"
+#include "datatypes_uri.h"
+#include "datatypes_flags.h"
+#include "filesystem_io.h"
+#include "fs_io_crypto.h"
+#include "token.h"
 
 #include <ncurses.h>
 
 #include <chrono>
 #include <iostream>
+#include <optional>
 
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-void fileop(int argc, char* argv[]);
+std::map<int, Uri> fileop(int argc, char** argv);
+std::map<int, Uri> parseOptions(int argc, char** argv);
 
-int main(int argc, char* argv[]) {
-    
-    fileop(argc,argv);
-    initscr ();
-    
-    curs_set (0);
+SecretKeyFlags runtimeFlag = SecretKeyFlags::base32_encoded_secretKey;
 
-    std::string decryptedFile = argv[3];
-    std::map<int,Uri> res = readAuthDB(decryptedFile);
+int main(int argc, char** argv) {
+    
+    std::map<int, Uri> res = parseOptions(argc, argv);
+    initscr();
+    
+    curs_set(0);
+
+//     std::string decryptedFile = argv[3];
+//     std::map<int, Uri> res2 = readAuthDB(decryptedFile);
+    
+    if(res.empty()) {
+        endwin();
+        curs_set(1);
+        std::cerr << "[Warning] Datafile is Empty. Exiting..." << std::endl;
+        exit(0);
+    }
     
     int codeDigits, stepPeriod;
     std::string hashAlgorithm;
     
-    bool flag=true;
+    bool flag = true;
     while(flag) {
         for(auto it:res) {
 
@@ -41,12 +54,12 @@ int main(int argc, char* argv[]) {
             hashAlgorithm = (it.second.parameters.hashAlgorithm=="") ?
                             "SHA1" : it.second.parameters.hashAlgorithm;
                             
-            std::string totp = computeTotpFromUri(it.second.parameters.secretKey,time,codeDigits,hashAlgorithm,stepPeriod);
-            std::string life = std::to_string(computeTotpLifetime(time,stepPeriod));
+            std::string totp = computeTotp(it.second.parameters.secretKey, time, codeDigits, hashAlgorithm, stepPeriod,runtimeFlag);
+            std::string life = std::to_string(computeTotpLifetime(time, stepPeriod));
             
             std::string line = it.second.labelIssuer + ": " + it.second.labelAccountName 
                                 + "\n\t" + totp + " [ " + life + " ]\n\n";
-            printw(line.c_str());
+            printw("%s", line.c_str());
             refresh();
             
         }
@@ -59,23 +72,115 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-void fileop(int argc, char* argv[]){
-    if (argc == 5){
+std::map<int, Uri> fileop(int argc, char** argv) {
+    std::map<int, Uri> blankMap;
+    if(argc == 5) {
 
-        char * action = argv[1];
-        const char *sourceFileName = argv[2];
-        const char *targetFileName = argv[3];
-        const char *passPhrase = argv[4];
+        char *action = argv[1];
+        const std::string sourceFileName = argv[2];
+        const std::string targetFileName = argv[3];
+        const std::string passPhrase = argv[4];
         
-        if (strcmp(action, "e") == 0){
-            EncryptFile(sourceFileName,targetFileName,passPhrase);
+        if(strcmp(action, "e") == 0) {
+            importFile(sourceFileName, targetFileName, passPhrase);
+//             return a;
         }
-        else if (strcmp(action, "d") == 0){
-            DecryptFile(sourceFileName,targetFileName,passPhrase);
+        else if(strcmp(action, "d") == 0) {
+            runtimeFlag = SecretKeyFlags::encrypted_secretKey;
+            if(authenticatePassPhrase(sourceFileName, passPhrase)){
+                return readAuthDB(sourceFileName, passPhrase);
+            }
+            else {
+                return blankMap;
+            }
         }
+        return blankMap;
     }
     else {
         std::cout << "Missing/Invalid params" << std::endl;
+        exit(1);
+//         return a;
+    }
+}
+
+std::map<int, Uri> parseOptions(int argc, char** argv) {
+    int i;
+    extern char* optarg;
+    
+    std::string clearfile;
+    std::string passPhrase;
+    std::string datafile;
+    std::string defaultConfigPath = "test.dat";
+    int encryptFlag = 0, passFlag = 0, dataFileFlag = 0, err = 0;
+    static char usage[] = "usage: %s \
+    [-f <datafile> | (-e <clearfile> -f <datafile>)] [-p <passphrase>]\n";
+    
+    while((i = getopt(argc,argv,"e:f:p:")) != -1) {
+        switch(i){
+            case 'e':
+                encryptFlag = 1;
+                clearfile.assign(optarg);
+                break;
+            case 'f':
+                dataFileFlag = 1;
+                datafile.assign(optarg);
+                break;
+            case 'p':
+                passFlag = 1;
+                passPhrase.assign(optarg);
+                break;
+            case '?':
+                err = 1;
+                break;
+        }
+    }
+    
+    if(err) {
+        fprintf(stderr, usage, argv[0]);
+        exit(1);
+    }
+    if(passFlag == 0) {
+        std::cout << "Enter the passphrase: ";
+        std::cin >> passPhrase;
+        passFlag = 1;
+    }
+    if(dataFileFlag == 0) {
+        std::pair<bool,std::string> tempPair = findDataFile();
+        if(tempPair.first == false) {
+            std::cerr << "[Error] Datafile not found" << std::endl;
+            std::cout << "creating new file";
+//             create new file by importFile(blankFile,defaultConfigPath,passPhrase);
+            importFile("", defaultConfigPath, passPhrase);
+            datafile = defaultConfigPath;
+        }
+        else {
+            std::cout << "Datafile found: " << tempPair.second << std::endl;
+            datafile = tempPair.second;
+            dataFileFlag = 1;
+        }
+    }
+    if(encryptFlag == 1) {
+        if(dataFileFlag == 0) {
+            std::cerr << "[Error] Datafile not provided, using current directory. Saving to: " 
+            << defaultConfigPath << std::endl;
+//             fprintf(stderr, usage, argv[0]);
+//             exit(1);
+        }
+        
+        if(statDataFile(clearfile)) {
+            importFile(clearfile, datafile, passPhrase);
+        }
+        else {
+            std::cerr << "[Error] Given Clearfile does not exist, please provide valid <clearfile>." << std::endl;
+            exit(1);
+        }
+    }
+    
+    runtimeFlag = SecretKeyFlags::encrypted_secretKey;
+    if(dataFileFlag == 1 && authenticatePassPhrase(datafile, passPhrase)) {
+        return readAuthDB(datafile, passPhrase);
+    }
+    else {
         exit(1);
     }
 }
