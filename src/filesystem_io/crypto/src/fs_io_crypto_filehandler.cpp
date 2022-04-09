@@ -1,6 +1,7 @@
 #include "fs_io_crypto_filehandler.h"
 
 #include "datatypes_secret.h"
+#include "datatypes_uri.h"
 
 #include <cryptopp/files.h>
 using CryptoPP::FileSource;
@@ -12,6 +13,7 @@ using CryptoPP::DefaultDecryptorWithMAC;
 
 #include <cryptopp/filters.h>
 using CryptoPP::StringSource;
+using CryptoPP::StringSink;
 using CryptoPP::ArraySource;
 using CryptoPP::ArraySink;
 using CryptoPP::Redirector;
@@ -197,9 +199,7 @@ bool authenticatePassPhrase(const std::string& filename, const std::string& pass
     
     std::string ivString;
     std::string challenge;
-    CryptoPP::ByteQueue challengesink;
     getline(f, ivString);
-    
     getline(f, challenge);
     
     RuntimeKeys fileKeys(passPhrase,ivString);
@@ -212,6 +212,7 @@ bool authenticatePassPhrase(const std::string& filename, const std::string& pass
     f.close();
     
     try {
+        CryptoPP::ByteQueue challengesink;
         GCM<AES>::Decryption decryptor;
         SecByteBlock masterKey = fileKeys.getKey();
         SecByteBlock masterIv = fileKeys.getIv();
@@ -225,4 +226,60 @@ bool authenticatePassPhrase(const std::string& filename, const std::string& pass
         std::cerr << "Authentication Failed!" << std::endl << ex.what() << std::endl;
         return false;
     }
+}
+
+std::map<int, Uri> runtimeEncrypt(std::map<int, Uri> uriMap, const std::string& passPhrase) {
+//  Take the encrypted data from file, decrypt it and re-encrypt it to a new dynamic key.
+//  The key stored in RuntimeKeys is the file key at first, which is overwritten by the dynamic key at the end.
+    if(uriMap.empty()) {
+        return uriMap;
+    }
+
+    try {
+        RuntimeKeys fileKeys;
+        SecByteBlock masterKey = fileKeys.getKey();
+        SecByteBlock masterIv = fileKeys.getIv();
+                
+        GCM<AES>::Decryption masterDecryptor;
+        masterDecryptor.SetKeyWithIV(masterKey, masterKey.size(), masterIv, masterIv.size());
+        
+        AutoSeededRandomPool prng;
+        SecByteBlock dynamicKey(AES::MAX_KEYLENGTH), dynamicIv(AES::BLOCKSIZE);
+        std::memset(dynamicKey, 0, dynamicKey.size());
+        std::memset(dynamicIv, 0, dynamicIv.size());
+        prng.GenerateBlock(dynamicIv, dynamicIv.size());
+        
+        HKDF<SHA256> hkdf;
+        //Using IV as salt
+        hkdf.DeriveKey(dynamicKey, dynamicKey.size(), (const byte*)passPhrase.data(), passPhrase.size(),
+                    (const byte*)dynamicIv.data(), dynamicIv.size(), NULL, 0);
+        
+        std::string dynamicIvString;
+        ArraySource(dynamicIv, dynamicIv.size(), true, 
+                        new CryptoPP::HexEncoder(new StringSink(dynamicIvString)));
+        
+        GCM<AES>::Encryption encryptor;
+        encryptor.SetKeyWithIV(dynamicKey, dynamicKey.size(), dynamicIv, dynamicIv.size());
+        
+        for(auto& it:uriMap) {
+            std::string fileSecret = it.second.parameters.secretKey;
+            it.second.parameters.secretKey.clear();
+            encryptor.SetKeyWithIV(dynamicKey, dynamicKey.size(), dynamicIv, dynamicIv.size());
+            masterDecryptor.SetKeyWithIV(masterKey, masterKey.size(), masterIv, masterIv.size());
+            
+            CryptoPP::StringSource ss1(fileSecret, true,
+                new HexDecoder(
+                    new AuthenticatedDecryptionFilter(masterDecryptor,
+                        new AuthenticatedEncryptionFilter(encryptor,
+                            new CryptoPP::HexEncoder(
+                                new CryptoPP::StringSink(it.second.parameters.secretKey))))));
+        }
+        RuntimeKeys dynamicKeys(passPhrase, dynamicIvString);
+        return uriMap;
+    }
+    catch(const CryptoPP::Exception& ex) {
+        std::cout << ex.what() << std::endl;
+        exit(1);
+    }
+    return uriMap;
 }

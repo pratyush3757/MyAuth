@@ -22,6 +22,7 @@ SecretKeyFlags runtimeFlag = SecretKeyFlags::base32_encoded_secretKey;
 int main(int argc, char** argv) {
     
     std::map<int, Uri> res = parseOptions(argc, argv);
+//     int xyz = 0;
     initscr();
     
     curs_set(0);
@@ -163,8 +164,6 @@ std::map<int, Uri> parseOptions(int argc, char** argv) {
         if(dataFileFlag == 0) {
             std::cerr << "[Error] Datafile not provided, using current directory. Saving to: " 
             << defaultConfigPath << std::endl;
-//             fprintf(stderr, usage, argv[0]);
-//             exit(1);
         }
         
         if(statDataFile(clearfile)) {

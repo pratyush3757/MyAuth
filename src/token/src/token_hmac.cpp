@@ -70,21 +70,6 @@ std::string computeHmacForGivenAlgorithm(const std::string& hmacSecretKey,
         ArraySink vectorSink(&hmacSecretKeyVector[0], hmacVectorSize);
         hmacKeySecByte.TransferTo(vectorSink);
         
-//         if(keyEncodingFlags==SecretKeyFlags::hex_encoded_secretKey) {
-//             StringSource ss(hmacSecretKey, true,
-//                 new HexDecoder(
-//                     new ArraySink(&hmacSecretKeyVector[0], hmacVectorSize)
-//                 )
-//             );
-//         }
-//         else {
-//             StringSource ss(hmacSecretKey, true,
-// //                 new CryptoPP::HexDecoder(
-//                     new ArraySink(&hmacSecretKeyVector[0], hmacVectorSize)
-// //                 )
-//             );
-//         }
-        
         //HMAC Transforms
         HMAC<CryptoPP::Weak::MD5> hmacMd5(
             &hmacSecretKeyVector[0], hmacSecretKeyVector.size());
@@ -178,7 +163,7 @@ static const ByteQueue decodeSecretKey(const std::string& hmacSecretKey,
             SecByteBlock masterKey = masterKeyData.getKey();
             SecByteBlock masterIv = masterKeyData.getIv();
             
-// //             std::cout <<"\nKey: "<< masterKeyData.getKeyData() <<std::endl<<"IV: "<<masterKeyData.getIvData()<<std::endl;
+//             std::cout <<"\nKey: "<< masterKeyData.getKeyData() <<std::endl<<"IV: "<<masterKeyData.getIvData()<<std::endl;
             
             encodedKeySecByte.Clear();
             StringSource(hmacSecretKey,true,new HexDecoder(new Redirector(encodedKeySecByte)));

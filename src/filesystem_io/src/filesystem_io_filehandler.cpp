@@ -1,5 +1,6 @@
 #include "filesystem_io_filehandler.h"
 #include "filesystem_io_uri.h"
+#include "fs_io_crypto.h"
 
 #include "datatypes_secret.h"
 
@@ -12,7 +13,7 @@
 
 static std::map<int, Uri> processLines(std::vector<std::string> lineVector);
 
-std::map<int, Uri> readAuthDB(const std::string& filename) {
+std::map<int, Uri> readRawDB(const std::string& filename) {
     if(filename.empty()) {      // handle blank filename for creation of new datafile
         std::map<int, Uri> blank;
         return blank;
@@ -91,7 +92,7 @@ std::map<int, Uri> readAuthDB(const std::string& filename, const std::string& pa
         
     f.close();
     
-    return processLines(linesVector);
+    return runtimeEncrypt(processLines(linesVector), passPhrase);
 }
 
 static std::map<int, Uri> processLines(std::vector<std::string> lineVector) {

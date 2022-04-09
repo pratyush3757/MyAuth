@@ -67,7 +67,7 @@ bool importRawFile(const std::string& clearFile,
                    const std::string& encryptedFile,
                    const std::string& passPhrase) {
     try {
-        std::map<int, Uri> fileDataMap = readAuthDB(clearFile);
+        std::map<int, Uri> fileDataMap = readRawDB(clearFile);
         
         if(fileDataMap.empty()) {
             std::cout << "[Warning] Datafile is empty." << std::endl;
@@ -102,7 +102,7 @@ bool importRawFile(const std::string& clearFile,
                     new Redirector(encryptedSink))));
         CryptoPP::StringSource(newline, true, new Redirector(encryptedSink));
         
-        for(auto it:fileDataMap) {
+        for(auto& it:fileDataMap) {
             std::string clear = it.second.parameters.secretKey;
             it.second.parameters.secretKey.clear();
             encryptor.SetKeyWithIV(key, key.size(), iv, iv.size());
