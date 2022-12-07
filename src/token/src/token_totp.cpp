@@ -20,13 +20,6 @@ std::string computeTotp(const std::string& secretKey, const long long int time,
     return computeHotp(secretKey, timeStep, codeDigits, hashAlgorithm, keyEncodingFlags);
 }
 
-std::string computeTotpFromUri(const std::string& secretKeyBase32, const long long int time,
-                        const int codeDigits,
-                        const std::string& hashAlgorithm,
-                        const int stepPeriod) {
-    return computeTotp(decodeBase32(secretKeyBase32), time, codeDigits, hashAlgorithm, stepPeriod, SecretKeyFlags::hex_encoded_secretKey);
-}
-
 int computeTotpLifetime(const long long int time, const int stepPeriod) {
     return stepPeriod-(time%stepPeriod);
 }

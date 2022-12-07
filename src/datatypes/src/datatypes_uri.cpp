@@ -1,4 +1,4 @@
-#include "filesystem_io_uri.h"
+#include "datatypes_uri.h"
 
 #include <iostream>
 #include <map>
@@ -7,7 +7,7 @@
 
 static std::map<std::string, std::string> split_query(const std::string& query);
 
-Uri parseUri(const std::string& uri) {
+Uri parseUriString(const std::string& uri) {
     Uri result;
 
     typedef std::string::const_iterator iterator_t;
@@ -152,29 +152,3 @@ std::string deriveUriString(const Uri inputUri){
     return outString;
 }
 
-/*
-int main() {
-    std::string test = "otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=6&period=30";
-    std::string test1 = "otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example";
-    
-    Uri a;
-    a = parseUri(test);
-    
-    std::cout << "Protocol: " << a.protocol 
-    << "\nOtpType: " << a.otpType << "\nLabel Issuer: " << a.labelIssuer 
-    << "\nLabel Accountname: " << a.labelAccountName
-    << "\nParameters: "  << std::endl
-    << "\tSecretKey: " << a.parameters.secretKey 
-    << "\n\tIssuer: "  << a.parameters.issuer 
-    << "\n\tAlgorithm: "  << a.parameters.hashAlgorithm
-    << "\n\tDigits: "  << a.parameters.codeDigits
-    << "\n\tCounter: "  << (a.parameters.counter==""?"yes":"no")
-    << "\n\tPeriod: "  << a.parameters.stepPeriod << std::endl;
-    
-//     std::map<std::string, std::string> res = split_query(a.queryString);
-//     for(const auto& elem : res) {
-//         std::cout << elem.first << " " << elem.second << "\n";
-//     }
-    
-    return 0;
-}*/

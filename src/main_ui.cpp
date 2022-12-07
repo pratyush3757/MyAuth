@@ -1,10 +1,12 @@
 #include "datatypes_uri.h"
 #include "datatypes_flags.h"
 #include "filesystem_io.h"
-#include "fs_io_crypto.h"
+#include "crypto.h"
 #include "token.h"
+#include "import_export.h"
 
 #include <ncurses.h>
+#include <cryptopp/misc.h>
 
 #include <chrono>
 #include <iostream>
@@ -83,7 +85,7 @@ std::map<int, Uri> fileop(int argc, char** argv) {
         const std::string passPhrase = argv[4];
         
         if(strcmp(action, "e") == 0) {
-            importFile(sourceFileName, targetFileName, passPhrase);
+            convertToDatafile(sourceFileName, targetFileName, passPhrase);
 //             return a;
         }
         else if(strcmp(action, "d") == 0) {
@@ -149,10 +151,11 @@ std::map<int, Uri> parseOptions(int argc, char** argv) {
         std::pair<bool,std::string> tempPair = findDataFile();
         if(tempPair.first == false) {
             std::cerr << "[Error] Datafile not found" << std::endl;
-            std::cout << "creating new file";
+//             std::cout << "creating new file";
 //             create new file by importFile(blankFile,defaultConfigPath,passPhrase);
-            importFile("", defaultConfigPath, passPhrase);
-            datafile = defaultConfigPath;
+//             importFile("", defaultConfigPath, passPhrase);
+//             datafile = defaultConfigPath;
+            exit(1); //cli doesn't support dynamic data addition yet
         }
         else {
             std::cout << "Datafile found: " << tempPair.second << std::endl;
@@ -167,7 +170,8 @@ std::map<int, Uri> parseOptions(int argc, char** argv) {
         }
         
         if(statDataFile(clearfile)) {
-            importFile(clearfile, datafile, passPhrase);
+            convertToDatafile(clearfile, datafile, passPhrase);
+            exit(0);
         }
         else {
             std::cerr << "[Error] Given Clearfile does not exist, please provide valid <clearfile>." << std::endl;
@@ -177,7 +181,10 @@ std::map<int, Uri> parseOptions(int argc, char** argv) {
     
     runtimeFlag = SecretKeyFlags::encrypted_secretKey;
     if(dataFileFlag == 1 && authenticatePassPhrase(datafile, passPhrase)) {
-        return readAuthDB(datafile, passPhrase);
+        std::map<int, Uri> a = readAuthDB(datafile, passPhrase);
+        CryptoPP::memset_z(passPhrase.data(), 0, passPhrase.size());
+//         memset(passPhrase,0,sizeof(passPhrase));
+        return a;
     }
     else {
         exit(1);

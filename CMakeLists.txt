@@ -8,8 +8,8 @@ project(my_auth VERSION 1.01.0
     LANGUAGES CXX
 )
 set (CMAKE_CXX_STANDARD 20)
-include_directories(include)
 add_subdirectory(src)
+target_include_directories(lib_my_auth PUBLIC include)
 
 # build tests
 project(${TESTNAME})

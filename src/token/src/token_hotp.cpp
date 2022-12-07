@@ -29,7 +29,7 @@ std::string computeHotp(const std::string& secretKey, const long long int counte
                         const std::string& hashAlgorithm,
                         SecretKeyFlags keyEncodingFlags) {
     const std::string hexEncodedCounter = computeHex(counter);
-    const std::string hexEncodedMac = computeHmacForGivenAlgorithm(
+    const std::string hexEncodedMac = computeHmac(
                                       secretKey, hexEncodedCounter,
                                       hashAlgorithm, keyEncodingFlags);
 

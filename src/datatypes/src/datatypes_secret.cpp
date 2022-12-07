@@ -14,6 +14,9 @@ using CryptoPP::StringSink;
 #include <cryptopp/hex.h>
 using CryptoPP::HexDecoder;
 
+#include <cryptopp/scrypt.h>
+using CryptoPP::Scrypt;
+
 #include <cryptopp/hkdf.h>
 using CryptoPP::HKDF;
 
@@ -38,9 +41,14 @@ SecByteBlock RuntimeKeys::decodeIv(const std::string& ivString) {
 SecByteBlock RuntimeKeys::deriveKeyFromPass(const std::string& passPhrase) {
     SecByteBlock derivedKey;
     derivedKey.resize(AES::MAX_KEYLENGTH);
-    HKDF<SHA256> hkdf;
-    hkdf.DeriveKey(derivedKey, derivedKey.size(), (const byte*)passPhrase.data(), passPhrase.size(),
-                   (const byte*)iv.data(), iv.size(), NULL, 0);
+    Scrypt scrypt;
+    //Using IV as salt
+    scrypt.DeriveKey(derivedKey, derivedKey.size(), (const byte*)passPhrase.data(), passPhrase.size(),
+                     iv.data(), iv.size());
+        
+//     HKDF<SHA256> hkdf;
+//     hkdf.DeriveKey(derivedKey, derivedKey.size(), (const byte*)passPhrase.data(), passPhrase.size(),
+//                    (const byte*)iv.data(), iv.size(), NULL, 0);
         
     return derivedKey;
 }

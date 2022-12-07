@@ -8,12 +8,15 @@
 #include <utility>
 
 std::map<int, Uri> readRawDB(const std::string& filename);
-std::map<int, Uri> readAuthDB(const std::string& filename, const std::string& passPhrase);
+
+std::map<int, Uri> readAuthDB(const std::string& dataFile, const std::string& passPhrase);
+
+std::pair<std::string,std::string> readIvAndChallenge(const std::string& dataFile);
+
 bool statDataFile(const std::string& dataFile);
+
 std::pair<bool, std::string> findDataFile();
 
-Uri parseUri(const std::string& uri);
-
-std::string deriveUriString(const Uri inputUri);
+bool updateDatafile(std::map<int, Uri> uriMap,const std::string& dataFile);
 
 #endif

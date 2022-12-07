@@ -9,7 +9,7 @@
 //                                          const std::string& hashAlgorithm = "SHA1", 
 //                                          bool nonAsciiKey = false);
 
-std::string computeHmacForGivenAlgorithm(const std::string& hmacSecretKey, 
+std::string computeHmac(const std::string& hmacSecretKey, 
                                          const std::string& hexEncodedMessage, 
                                          const std::string& hashAlgorithm = "SHA1", 
                                          SecretKeyFlags keyEncodingFlags=SecretKeyFlags::ascii_secretKey);

@@ -51,14 +51,13 @@ typedef unsigned char byte;
 
 static const CryptoPP::byte ALPHABET[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"; // Most libraries use RFC4648, not CryptoPP.
 
-static const std::string decodeBase32(const std::string& encoded);
 static const ByteQueue decodeSecretKey(const std::string& hmacSecretKey,
                                        SecretKeyFlags keyEncodingFlags);
 
-std::string computeHmacForGivenAlgorithm(const std::string& hmacSecretKey,
-                                         const std::string& hexEncodedMessage,
-                                         const std::string& hashAlgorithm,
-                                         SecretKeyFlags keyEncodingFlags) {
+std::string computeHmac(const std::string& hmacSecretKey,
+                        const std::string& hexEncodedMessage,
+                        const std::string& hashAlgorithm,
+                        SecretKeyFlags keyEncodingFlags) {
     std::string mac;
     mac.clear();
     try {
@@ -119,31 +118,6 @@ std::string computeHmacForGivenAlgorithm(const std::string& hmacSecretKey,
     return mac;
 }
 
-static const std::string decodeBase32(const std::string& encoded) {
-    std::string decoded;
-
-    static int decoding_array[256];
-    CryptoPP::Base32Decoder::InitializeDecodingLookupArray(decoding_array, 
-                               ALPHABET, 
-                               32, 
-                               true); // false = case insensitive
-
-    CryptoPP::Base32Decoder b32decoder;
-    CryptoPP::AlgorithmParameters dp = CryptoPP::MakeParameters(
-                                       CryptoPP::Name::DecodingLookupArray(),
-                                       (const int *)decoding_array,
-                                       false);
-    b32decoder.IsolatedInitialize(dp); 
-
-    b32decoder.Attach(new CryptoPP::HexEncoder(
-                        new CryptoPP::StringSink(decoded))
-    );
-    b32decoder.Put((std::uint8_t*)encoded.c_str(), encoded.size());
-    b32decoder.MessageEnd();
-
-    return decoded;
-}
-
 static const ByteQueue decodeSecretKey(const std::string& hmacSecretKey,
                                        SecretKeyFlags keyEncodingFlags) {
     ByteQueue encodedKeySecByte, hmacSecByte;
@@ -185,9 +159,9 @@ static const ByteQueue decodeSecretKey(const std::string& hmacSecretKey,
 
         CryptoPP::Base32Decoder b32decoder;
         CryptoPP::AlgorithmParameters dp = CryptoPP::MakeParameters(
-            CryptoPP::Name::DecodingLookupArray(),
-            (const int *)decoding_array,
-            false);
+                                            CryptoPP::Name::DecodingLookupArray(),
+                                            (const int *)decoding_array,
+                                            false);
         b32decoder.IsolatedInitialize(dp);
         b32decoder.Attach(new Redirector(hmacSecByte));
         encodedKeySecByte.TransferTo(b32decoder);

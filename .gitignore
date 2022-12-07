@@ -3,6 +3,7 @@ build/
 TODO
 .experimental/
 *.kdev4
+.cache/
 ##Predefined
 
 ##CMake

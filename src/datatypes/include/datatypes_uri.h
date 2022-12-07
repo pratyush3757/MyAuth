@@ -1,5 +1,5 @@
-#ifndef _DATATYPE_URI_
-#define _DATATYPE_URI_
+#ifndef _DATATYPES_URI_H_
+#define _DATATYPES_URI_H_
 
 #include <string>
 
@@ -12,5 +12,9 @@ public:
     } parameters;
 
 };
+
+Uri parseUriString(const std::string& uri);
+
+std::string deriveUriString(const Uri inputUri);
 
 #endif

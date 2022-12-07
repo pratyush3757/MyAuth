@@ -1,5 +1,5 @@
-#ifndef _DATATYPE_FLAGS_
-#define _DATATYPE_FLAGS_
+#ifndef _DATATYPES_FLAGS_H_
+#define _DATATYPES_FLAGS_H_
 
 #include <cstdint>
 #include <type_traits>
